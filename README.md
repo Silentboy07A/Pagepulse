@@ -234,6 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-- **Name** - [Silentboy07A](https://github.com/Silentboy07A)
-- **LinkedIn** - [Profile](https://linkedin.com/in/silentboy07a)
-- **GitHub** - [@Silentboy07A](https://github.com/Silentboy07A)
+**Sakthi B**
+
+- LinkedIn: https://www.linkedin.com/in/sakthi-b-5298aa356/
+- GitHub: https://github.com/Silentboy07A
