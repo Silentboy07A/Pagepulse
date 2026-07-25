@@ -398,7 +398,7 @@ function App() {
                     icon={<Type className="h-5 w-5" />}
                     label="Page Title"
                     value={result.title || 'No title found'}
-                    badge={result.title ? (result.title.trim().length < 30 || result.title.trim().length > 65 ? 'Warning' : 'Good') : 'Missing'}
+                    badge={result.title ? (result.title.trim().length < 30 || result.title.trim().length > 65 ? 'Info' : 'Good') : 'Missing'}
                     sublabel={`Length: ${result.title?.length || 0} characters`}
                     statusColor={getTitleColor(result.title)}
                   />
@@ -407,7 +407,7 @@ function App() {
                     icon={<AlignLeft className="h-5 w-5" />}
                     label="Meta Description"
                     value={result.meta_description || 'No description found'}
-                    badge={result.meta_description ? (result.meta_description.trim().length < 80 || result.meta_description.trim().length > 165 ? 'Warning' : 'Good') : 'Missing'}
+                    badge={result.meta_description ? (result.meta_description.trim().length < 80 || result.meta_description.trim().length > 165 ? 'Info' : 'Good') : 'Missing'}
                     sublabel={`Length: ${result.meta_description?.length || 0} characters`}
                     statusColor={getDescriptionColor(result.meta_description)}
                   />
