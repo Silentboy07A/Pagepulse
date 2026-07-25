@@ -18,7 +18,9 @@ export const UrlForm: React.FC<UrlFormProps> = ({
 
   useEffect(() => {
     if (initialValue) {
-      setUrl(initialValue);
+      requestAnimationFrame(() => {
+        setUrl(initialValue);
+      });
     }
   }, [initialValue]);
 
@@ -27,10 +29,29 @@ export const UrlForm: React.FC<UrlFormProps> = ({
     const trimmed = url.trim();
     if (!trimmed) {
       if (onValidationError) {
-        onValidationError('URL input is empty. Please specify a target URL.');
+        onValidationError('Please enter a valid URL starting with http:// or https://');
       }
       return;
     }
+
+    // Check prefix
+    if (!/^https?:\/\//i.test(trimmed)) {
+      if (onValidationError) {
+        onValidationError('Please enter a valid URL starting with http:// or https://');
+      }
+      return;
+    }
+
+    // Try parsing
+    try {
+      new URL(trimmed);
+    } catch {
+      if (onValidationError) {
+        onValidationError('Please enter a valid URL starting with http:// or https://');
+      }
+      return;
+    }
+
     onSubmit(trimmed);
   };
 
@@ -49,6 +70,8 @@ export const UrlForm: React.FC<UrlFormProps> = ({
             
             <input
               type="text"
+              id="url-input"
+              aria-label="Website URL to audit"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., https://example.com)"

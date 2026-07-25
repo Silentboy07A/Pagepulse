@@ -22,6 +22,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   numericValue,
   valueSuffix = '',
 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const isExpandable = typeof value === 'string' && value.length > 50 && (label === 'Page Title' || label === 'Meta Description');
+
   const containerClasses = {
     green: 'bg-emerald-50/10 border-emerald-200/50 hover:bg-emerald-50/20 dark:bg-emerald-950/10 dark:border-emerald-900/30 dark:hover:bg-emerald-950/20',
     yellow: 'bg-amber-50/10 border-amber-200/50 hover:bg-amber-50/20 dark:bg-amber-950/10 dark:border-amber-800/30 dark:hover:bg-amber-950/20',
@@ -84,11 +87,11 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
         <div className="mt-2.5">
           <span
-            className={`text-xl font-extrabold tracking-tight line-clamp-2 leading-snug ${
+            className={`text-xl font-extrabold tracking-tight leading-snug ${
               isPlaceholder
                 ? 'italic font-medium text-slate-400 dark:text-slate-500'
                 : valueClasses[statusColor]
-            }`}
+            } ${isExpandable && !isExpanded ? 'line-clamp-2' : ''}`}
             title={String(value)}
           >
             {numericValue !== undefined && !isPlaceholder ? (
@@ -100,6 +103,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               value
             )}
           </span>
+          {isExpandable && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 focus:outline-none block"
+            >
+              {isExpanded ? 'Show less' : 'Show full text'}
+            </button>
+          )}
         </div>
       </div>
 

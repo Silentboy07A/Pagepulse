@@ -14,7 +14,9 @@ export const HealthScore: React.FC<HealthScoreProps> = ({ score }) => {
     let start = 0;
     const end = scaledScore;
     if (end === 0) {
-      setDisplayScore(0);
+      requestAnimationFrame(() => {
+        setDisplayScore(0);
+      });
       return;
     }
     const duration = 400; // in ms
@@ -34,22 +36,28 @@ export const HealthScore: React.FC<HealthScoreProps> = ({ score }) => {
 
   // Score categories mapping based on 0-100 scale
   const getScoreDetails = (val: number) => {
-    if (val >= 90) {
+    if (val >= 95) {
       return {
         label: 'Excellent',
         badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50',
         bar: 'bg-emerald-500',
       };
-    } else if (val >= 70) {
+    } else if (val >= 80) {
       return {
         label: 'Good',
-        badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
+        badge: 'bg-blue-50 text-blue-705 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50',
+        bar: 'bg-blue-500',
+      };
+    } else if (val >= 60) {
+      return {
+        label: 'Needs Improvement',
+        badge: 'bg-amber-50 text-amber-705 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
         bar: 'bg-amber-500',
       };
     } else {
       return {
         label: 'Poor',
-        badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50',
+        badge: 'bg-rose-50 text-rose-750 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50',
         bar: 'bg-rose-500',
       };
     }

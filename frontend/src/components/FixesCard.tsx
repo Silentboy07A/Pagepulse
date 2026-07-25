@@ -97,7 +97,7 @@ export const FixesCard: React.FC<FixesCardProps> = ({ fixes }) => {
         {!hasIssues ? (
           <div className="flex items-center gap-3 bg-emerald-50/20 dark:bg-emerald-950/10 rounded-xl p-4 border border-emerald-100/30 dark:border-emerald-900/25 h-full min-h-[100px]">
             <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-400 leading-relaxed">
-              No critical issues detected.
+              No critical issues detected. Your page looks healthy.
             </p>
           </div>
         ) : (

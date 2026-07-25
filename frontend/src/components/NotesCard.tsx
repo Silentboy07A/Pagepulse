@@ -42,16 +42,14 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes }) => {
             </p>
           </div>
         ) : (
-          <div className="space-y-3 w-full">
+          <div className="flex flex-wrap gap-2.5 w-full">
             {notes.map((note, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 bg-blue-50/20 dark:bg-blue-950/10 p-3.5 rounded-xl border border-blue-100/30 dark:border-blue-900/25 shadow-sm transition-all hover:border-blue-300 dark:hover:border-blue-800/80 w-full"
+                className="inline-flex items-center gap-2 bg-blue-50/50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border border-blue-150/40 dark:border-blue-900/35 px-3 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:border-blue-300 dark:hover:border-blue-800/85"
               >
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <span className="text-xs font-semibold text-blue-900 dark:text-blue-300 leading-normal">
-                  {note}
-                </span>
+                <Info className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>{note}</span>
               </div>
             ))}
           </div>

@@ -36,15 +36,18 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({ error, onRetry, onReturn }
   };
 
   const getSubtext = () => {
+    if (error.message) {
+      return error.message;
+    }
     switch (error.type) {
       case 'client':
-        return 'The address entered is empty or does not follow standard URL protocols. Ensure it begins with HTTP or HTTPS.';
+        return 'Please enter a valid URL starting with http:// or https://';
       case 'network':
-        return 'The network request failed because the backend service is unreachable. Verify your local service is online.';
+        return 'Network connection lost or backend is unreachable.';
       case 'timeout':
-        return 'The backend server took too long to complete the audit. The standard 15-second response limit was reached.';
+        return 'Request timed out.';
       default:
-        return error.message || 'The server returned an invalid response during Crawl operations. Check logs for details.';
+        return 'An unexpected error occurred.';
     }
   };
 

@@ -15,9 +15,10 @@ const STEPS = [
 
 export const Loader: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [showWakingUpMessage, setShowWakingUpMessage] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const stepTimer = setInterval(() => {
       setActiveStep((prev) => {
         if (prev < STEPS.length - 1) {
           return prev + 1;
@@ -26,7 +27,14 @@ export const Loader: React.FC = () => {
       });
     }, 300); // 300ms transition time per diagnostic step
 
-    return () => clearInterval(timer);
+    const wakeupTimer = setTimeout(() => {
+      setShowWakingUpMessage(true);
+    }, 5000);
+
+    return () => {
+      clearInterval(stepTimer);
+      clearTimeout(wakeupTimer);
+    };
   }, []);
 
   const containerVariants = {
@@ -103,6 +111,18 @@ export const Loader: React.FC = () => {
             );
           })}
         </div>
+
+        {showWakingUpMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200/30 dark:border-amber-900/30 rounded-xl text-center"
+          >
+            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold leading-normal">
+              The server is starting. This may take a few seconds.
+            </p>
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );

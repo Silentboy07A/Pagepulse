@@ -19,7 +19,9 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     const startValue = 0;
 
     if (endValue === 0) {
-      setDisplayValue(0);
+      requestAnimationFrame(() => {
+        setDisplayValue(0);
+      });
       return;
     }
 

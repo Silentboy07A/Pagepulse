@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Server,
@@ -14,17 +14,19 @@ import {
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { UrlForm } from './components/UrlForm';
-import { FeatureCards } from './components/FeatureCards';
 import { Loader } from './components/Loader';
 import { ErrorCard } from './components/ErrorCard';
 import { MetricCard } from './components/MetricCard';
 import { HealthScore } from './components/HealthScore';
-import { FixesCard } from './components/FixesCard';
-import { NotesCard } from './components/NotesCard';
 import { Footer } from './components/Footer';
 
 import { analyzeUrl, AnalysisError } from './services/api';
 import type { AnalysisResult } from './types/AnalysisResult';
+
+// Lazy load heavier components to optimize initial load bundle performance
+const FeatureCards = lazy(() => import('./components/FeatureCards'));
+const FixesCard = lazy(() => import('./components/FixesCard'));
+const NotesCard = lazy(() => import('./components/NotesCard'));
 
 type AppState = 'idle' | 'loading' | 'error' | 'success';
 
@@ -33,6 +35,11 @@ function App() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<AnalysisError | null>(null);
   const [urlInput, setUrlInput] = useState('');
+
+  const handleTryAgain = () => {
+    setState('idle');
+    setError(null);
+  };
 
   // Light/Dark Theme Setup
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -55,6 +62,19 @@ function App() {
     }
   }, [isDark]);
 
+  // Global keyboard navigation: Escape key closes/clears the error card
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (state === 'error') {
+          handleTryAgain();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [state]);
+
   const handleToggleTheme = () => {
     setIsDark(!isDark);
   };
@@ -70,11 +90,11 @@ function App() {
       const data = await analyzeUrl(url);
       setResult(data);
       setState('success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const formattedError =
         err instanceof AnalysisError
           ? err
-          : new AnalysisError('network', err.message || 'An unexpected error occurred.');
+          : new AnalysisError('network', (err as Error).message || 'An unexpected error occurred.');
       setError(formattedError);
       setState('error');
     }
@@ -87,13 +107,13 @@ function App() {
     setState('error');
   };
 
-  const handleTryAgain = () => {
-    setState('idle');
-    setError(null);
-  };
-
   // Helper styles mappings for metrics cards
   const getHttpStatusColor = (code: number): 'green' | 'yellow' | 'red' | 'neutral' | 'blue' => {
+    if (code === 200) return 'green';
+    if (code === 301 || code === 302) return 'blue';
+    if (code === 403 || code === 404 || code === 500) return 'red';
+    if (code === 429) return 'yellow';
+
     if (code >= 200 && code < 300) return 'green';
     if (code >= 300 && code < 400) return 'blue';
     if (code >= 400 && code < 500) return 'yellow';
@@ -102,22 +122,31 @@ function App() {
   };
 
   const getHttpStatusBadge = (code: number): string => {
+    if (code === 200) return 'Healthy';
+    if (code === 301 || code === 302) return 'Website redirected';
+    if (code === 403) return 'Website blocks automated requests';
+    if (code === 404) return 'Page not found';
+    if (code === 429) return 'Too many requests';
+    if (code === 500) return 'Internal server error';
+
     if (code >= 200 && code < 300) return 'Healthy';
-    if (code >= 300 && code < 400) return 'Redirect';
-    if (code >= 400 && code < 500) return 'Client Error';
+    if (code >= 300 && code < 400) return 'Website redirected';
+    if (code >= 400 && code < 505) return 'Client Error';
     if (code >= 500) return 'Server Error';
-    return 'Unknown Status';
+    return `Status ${code}`;
   };
 
-  const getResponseTimeColor = (ms: number): 'green' | 'yellow' | 'red' | 'neutral' => {
-    if (ms < 500) return 'green';
-    if (ms <= 1000) return 'yellow';
+  const getResponseTimeColor = (ms: number): 'green' | 'yellow' | 'red' | 'neutral' | 'blue' => {
+    if (ms < 300) return 'green';
+    if (ms <= 800) return 'blue';
+    if (ms <= 1500) return 'yellow';
     return 'red';
   };
 
   const getResponseTimeBadge = (ms: number): string => {
-    if (ms < 500) return 'Excellent';
-    if (ms <= 1000) return 'Good';
+    if (ms < 300) return 'Excellent';
+    if (ms <= 800) return 'Good';
+    if (ms <= 1500) return 'Average';
     return 'Slow';
   };
 
@@ -227,7 +256,9 @@ function App() {
                 className="w-full"
               >
                 {/* Feature Cards and Product Overview in Idle State */}
-                <FeatureCards />
+                <Suspense fallback={<div className="h-40 animate-pulse bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/80 rounded-2xl max-w-4xl mx-auto mt-12 md:mt-16 w-full" />}>
+                  <FeatureCards />
+                </Suspense>
 
                 {/* Workflow overview */}
                 <div className="mt-20 border-t border-slate-200/50 dark:border-slate-800/80 pt-16 max-w-4xl mx-auto w-full text-center">
@@ -412,8 +443,12 @@ function App() {
                   variants={itemVariants}
                   className="grid grid-cols-1 md:grid-cols-2 gap-6"
                 >
-                  <FixesCard fixes={result.priority_fixes} />
-                  <NotesCard notes={result.engineering_notes} />
+                  <Suspense fallback={<div className="h-60 animate-pulse bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/80 rounded-2xl p-5" />}>
+                    <FixesCard fixes={result.priority_fixes} />
+                  </Suspense>
+                  <Suspense fallback={<div className="h-60 animate-pulse bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/80 rounded-2xl p-5" />}>
+                    <NotesCard notes={result.engineering_notes} />
+                  </Suspense>
                 </motion.div>
               </motion.div>
             )}
