@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type { AnalysisResult } from '../types/AnalysisResult';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://pagepulse-kcqb.onrender.com";
+
 export type ErrorType = 'client' | 'network' | 'http' | 'timeout';
 
 export class AnalysisError extends Error {
@@ -18,7 +20,7 @@ export class AnalysisError extends Error {
 export async function analyzeUrl(url: string): Promise<AnalysisResult> {
   try {
     const response = await axios.post<AnalysisResult>(
-      'http://localhost:8000/analyze',
+      `${API_BASE_URL}/analyze`,
       { url },
       {
         headers: {
@@ -49,7 +51,7 @@ export async function analyzeUrl(url: string): Promise<AnalysisResult> {
         // Request made, but no response was received (network unreachable)
         throw new AnalysisError(
           'network',
-          'Unable to reach the analysis backend. Please verify that the backend server is running and reachable on localhost:8000.'
+          `Unable to reach the analysis backend. Please verify that the backend server is running and reachable at ${API_BASE_URL}.`
         );
       }
     }
